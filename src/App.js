@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Square({ value, onSquareClick }) { //ATTENTION: NOTICE THE OBJECT WRAPPER AROUND THE FUNCTION ARGUMENT!!
+function Square({ value, onSquareClick }) { //ATTENTION: NOTICE THE OBJECT {WRAPPER} AROUND THE FUNCTION ARGUMENT!!
   return (
     <button
       className="square"
@@ -11,7 +11,7 @@ function Square({ value, onSquareClick }) { //ATTENTION: NOTICE THE OBJECT WRAPP
   ) ;
 }
 
-function Row( { id, value, onSquareClick } ) { //ATTENTION: NOTICE THE OBJECT WRAPPER AROUND THE FUNCTION ARGUMENT!!
+function Row( { id, value, onSquareClick } ) { // Use props for downward movement of data, like value={0}
   return (
     <div className="board-row">
       <Square value={value[0]} onSquareClick={ () => onSquareClick(id, 0) } />
@@ -21,7 +21,7 @@ function Row( { id, value, onSquareClick } ) { //ATTENTION: NOTICE THE OBJECT WR
   ) ;
 }
 
-function Board( { currentMove, board, onPlay } ) { //ATTENTION: NOTICE THE OBJECT WRAPPER AROUND THE FUNCTION ARGUMENT!!
+function Board( { currentMove, board, onPlay } ) {
 
   const winner = calculateWinner(board);
   const xIsNext = currentMove % 2 === 0;
@@ -31,7 +31,7 @@ function Board( { currentMove, board, onPlay } ) { //ATTENTION: NOTICE THE OBJEC
     if( nextSquares[l][c] !== null || winner !== null ) return;
     let mark = xIsNext ? "X" : "O";
     nextSquares[l][c] = mark;
-    onPlay(nextSquares);
+    onPlay(nextSquares, l, c); //use functions passed onto Components for upward data movement
   }
 
   let status;
@@ -63,25 +63,23 @@ export default function Game() {
       {
         "xIsPlayer": xIsNext, //redundant, but forces me to exercise object manipulation with useState
         "board": Array.from( {length: 3}, () => Array(3).fill(null) ),
-        // "status": "Initialized board" // next step: naming what was done in each recorded item
+        "status": "Initialized board" // next step: naming what was done in each recorded item
       }
     ]
   );
   const currentBoard = history[ currentMove ].board;
 
-  function handlePlay(nextSquares){
-    const nextHistory = [ ...history.slice(0, currentMove + 1), { 'xIsPlayer': xIsNext, 'board': nextSquares } ];
+  function handlePlay(nextSquares, l, c){
+    const nextHistory = [ ...history.slice(0, currentMove + 1), { 'xIsPlayer': xIsNext, 'board': nextSquares, 'status': `${xIsNext ? "X" : "O"} played on (${l},${c})` } ];
     setHistory( nextHistory );
     setCurrentMove( nextHistory.length - 1 );
-
-    console.log(`current move: ${currentMove}`)
   }
 
   
   let moveList = history.map( ( state, move ) => { //By default, for each item, arg0 is the item itself, arg1 is its index number
     let description;
     if (move > 0) {
-      description = `Rollback to move #${move}`;
+      description = `Rollback to ${state.status}`;
     } else {
       description = 'Reset game';
     }
