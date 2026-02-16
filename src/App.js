@@ -21,9 +21,10 @@ function Row( { id, value, onSquareClick } ) { //ATTENTION: NOTICE THE OBJECT WR
   ) ;
 }
 
-function Board( { xIsNext, board, onPlay } ) { //ATTENTION: NOTICE THE OBJECT WRAPPER AROUND THE FUNCTION ARGUMENT!!
+function Board( { currentMove, board, onPlay } ) { //ATTENTION: NOTICE THE OBJECT WRAPPER AROUND THE FUNCTION ARGUMENT!!
 
   const winner = calculateWinner(board);
+  const xIsNext = currentMove % 2 === 0;
 
   function handleClick(l, c) {
     const nextSquares = board.map( (row) => row.slice() ); // need to slice each inner array, otherwise shallow copy will still reference the old inner arrays
@@ -37,8 +38,10 @@ function Board( { xIsNext, board, onPlay } ) { //ATTENTION: NOTICE THE OBJECT WR
 
   if (winner !== null) {
     status = `Winner: ${winner}`;
-  } else {
+  } else if (currentMove < 9) {
     status = `Next player: ${xIsNext ? "X": "O"}`;
+  } else {
+    status = "Stalemate"
   }
 
   return (
@@ -70,6 +73,8 @@ export default function Game() {
     const nextHistory = [ ...history.slice(0, currentMove + 1), { 'xIsPlayer': xIsNext, 'board': nextSquares } ];
     setHistory( nextHistory );
     setCurrentMove( nextHistory.length - 1 );
+
+    console.log(`current move: ${currentMove}`)
   }
 
   
@@ -96,7 +101,7 @@ export default function Game() {
     <div className='game'>
 
       <div className='game-board'>
-        <Board xIsNext={xIsNext} board={currentBoard} onPlay={handlePlay} />
+        <Board currentMove={currentMove} board={currentBoard} onPlay={handlePlay} />
       </div>
 
       <div className='game-info'>
