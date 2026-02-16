@@ -58,15 +58,13 @@ export default function Game() {
   const [ history, setHistory ] = useState( 
     [ 
       {
-        "xIsPlayer": xIsNext,
-        "board": Array.from( {length: 3}, () => Array(3).fill(null) )
+        "xIsPlayer": xIsNext, //redundant, but forces me to exercise object manipulation with useState
+        "board": Array.from( {length: 3}, () => Array(3).fill(null) ),
+        // "status": "Initialized board" // next step: naming what was done in each recorded item
       }
     ]
   );
   const currentBoard = history[ currentMove ].board;
-
-  console.log(`currentMove: ${currentMove}`)
-  console.log(`currentBoard: ${history[ currentMove ]}`)
 
   function handlePlay(nextSquares){
     const nextHistory = [ ...history.slice(0, currentMove + 1), { 'xIsPlayer': xIsNext, 'board': nextSquares } ];
@@ -92,6 +90,7 @@ export default function Game() {
   
   function rollBack(move) {
     setCurrentMove(move);
+    setHistory( (prevHistory) => prevHistory.slice(0, move + 1) ); // destructive rollback, deletes history
   }
   return (
     <div className='game'>
