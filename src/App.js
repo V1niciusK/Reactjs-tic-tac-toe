@@ -75,21 +75,35 @@ export default function Game() {
     setCurrentMove( nextHistory.length - 1 );
   }
 
-  
-  let moveList = history.map( ( state, move ) => { //By default, for each item, arg0 is the item itself, arg1 is its index number
+  // New moveList, last item is not a button
+
+  function moveList() {
+    let tempList = [];
     let description;
-    if (move > 0) {
-      description = `Rollback to ${state.status}`;
-    } else {
-      description = 'Reset game';
-    }
-    return (
-      <li key={move}>
-        <button onClick={ () => rollBack(move) }>{description}</button>
-      </li>
-    )
     
-  } )
+    for (let s = 0 ; s < ( history.length - 1 ); s ++) {
+      if (s > 0) {
+        description = `Rollback to when ${history[s].status}`;
+      } else {
+        description = 'Reset game';
+      }
+      tempList.push(
+        <li key={s - 1}>
+          <button onClick={ () => rollBack(s) }>{description}</button>
+        </li>
+      )
+    }
+
+    if (currentMove < 9){
+      tempList.push(
+        <li key={history.length}>
+          <p>{ currentMove % 2 === 0 ? "X" : "O" } moves</p>
+        </li>
+      )
+    }
+
+    return tempList;
+  }
   
   function rollBack(move) {
     setCurrentMove(move);
@@ -103,7 +117,7 @@ export default function Game() {
       </div>
 
       <div className='game-info'>
-        <ol>{moveList}</ol>
+        <ol>{moveList()}</ol>
       </div>
 
     </div>
